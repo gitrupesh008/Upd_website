@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #003366;
+  --color-accent: #FFBF00;
+  --color-accent-hover: #e6ac00;
+  --color-ivory: #FCFBF7;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Playfair Display", ui-serif, Georgia, serif;
+}
+
+body {
+  background-color: var(--color-ivory);
+  color: #1f2937;
+}
+
+.muggulu-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 0L40 20L20 40L0 20L20 0ZM20 4L4 20L20 36L36 20L20 4Z' fill='%23FFBF00' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+}

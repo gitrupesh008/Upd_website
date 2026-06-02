@@ -1,0 +1,8 @@
+{
+  "name": "Lions District 316-G",
+  "description": "Lions International District 316-G official website focusing on community medical camps and humanitarian service across Andhra Pradesh.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
