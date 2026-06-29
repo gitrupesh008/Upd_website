@@ -3,33 +3,54 @@ import { useState, useMemo } from "react";
 import { X, Grid3x3, List } from "lucide-react";
 import { useLanguage } from "../LanguageContext";
 import { motion, AnimatePresence } from "motion/react";
+import { useManagedEvents } from "../hooks/useManagedEvents";
 
 interface GalleryImage {
+  id: string;
   url: string;
   alt: string;
-}
-
-// Dynamically load all images from assets/images folder
-function loadGalleryImages(): GalleryImage[] {
-  const images = import.meta.glob<{ default: string }>(
-    "../../assets/images/*.{jpeg,jpg,png}",
-    {
-      eager: true,
-    },
-  );
-  return Object.values(images).map((img: any) => ({
-    url: img.default,
-    alt: "Community event photo",
-  }));
+  eventId: string;
+  eventTitle: string;
+  eventDate: string;
 }
 
 export default function Gallery() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [displayMode, setDisplayMode] = useState<"grid" | "list">("grid");
+  const [selectedEventId, setSelectedEventId] = useState("all");
   const { lang } = useLanguage();
+  const { events } = useManagedEvents();
 
-  // Memoize gallery images to avoid reloading on each render
-  const galleryImages = useMemo(() => loadGalleryImages(), []);
+  const sortedEvents = useMemo(
+    () =>
+      [...events].sort(
+        (firstEvent, secondEvent) =>
+          new Date(firstEvent.date).getTime() -
+          new Date(secondEvent.date).getTime(),
+      ),
+    [events],
+  );
+
+  const galleryImages = useMemo(
+    () =>
+      sortedEvents.flatMap((event) =>
+        event.gallery.map((image) => ({
+          ...image,
+          eventId: event.id,
+          eventTitle: lang === "en" ? event.title_en : event.title_te,
+          eventDate: event.date,
+        })),
+      ),
+    [lang, sortedEvents],
+  );
+
+  const filteredImages = useMemo(
+    () =>
+      selectedEventId === "all"
+        ? galleryImages
+        : galleryImages.filter((image) => image.eventId === selectedEventId),
+    [galleryImages, selectedEventId],
+  );
 
   // Close lightbox on escape key
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -56,6 +77,30 @@ export default function Gallery() {
               ? "Glimpses from our recent medical camps, volunteer drives, and community events across the district."
               : "మన ఇటీవలి వైద్య శిబిరాలు, స్వచ్ఛంద కార్యక్రమాలు మరియు కమ్యూనిటీ ఈవెంట్‌ల దృశ్యాలు."}
           </p>
+
+          <div className="mb-5 flex flex-wrap justify-center gap-2">
+            <button
+              onClick={() => setSelectedEventId("all")}
+              className={`rounded-lg px-4 py-2 text-sm font-semibold transition-all ${
+                selectedEventId === "all"
+                  ? "bg-accent text-primary shadow-sm"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}>
+              {lang === "en" ? "All Events" : "అన్ని ఈవెంట్లు"}
+            </button>
+            {sortedEvents.map((event) => (
+              <button
+                key={event.id}
+                onClick={() => setSelectedEventId(event.id)}
+                className={`rounded-lg px-4 py-2 text-sm font-semibold transition-all ${
+                  selectedEventId === event.id
+                    ? "bg-accent text-primary shadow-sm"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}>
+                {lang === "en" ? event.title_en : event.title_te}
+              </button>
+            ))}
+          </div>
 
           {/* Layout Toggle Buttons */}
           <div className="flex justify-center gap-3">
@@ -94,13 +139,13 @@ export default function Gallery() {
               ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6"
               : "grid grid-cols-1 gap-4"
           }>
-          {galleryImages.map((img: GalleryImage, i: number) => (
+          {filteredImages.map((img: GalleryImage, i: number) => (
             <motion.div
               variants={{
                 hidden: { opacity: 0, scale: 0.95 },
                 visible: { opacity: 1, scale: 1 },
               }}
-              key={i}
+              key={`${img.eventId}-${img.id}`}
               className={
                 displayMode === "grid"
                   ? "relative aspect-[4/3] rounded-lg overflow-hidden cursor-pointer group shadow-sm hover:shadow-xl transition-all"
@@ -118,8 +163,10 @@ export default function Gallery() {
               />
               {displayMode === "list" && (
                 <div className="flex-1 flex flex-col justify-center py-2">
-                  <p className="text-gray-700 font-medium">Image {i + 1}</p>
-                  <p className="text-gray-500 text-sm">Click to expand</p>
+                  <p className="text-gray-700 font-medium">{img.eventTitle}</p>
+                  <p className="text-gray-500 text-sm">
+                    {img.eventDate} | Image {i + 1}
+                  </p>
                 </div>
               )}
               {displayMode === "grid" && (
@@ -132,6 +179,16 @@ export default function Gallery() {
             </motion.div>
           ))}
         </motion.div>
+
+        {filteredImages.length === 0 && (
+          <div className="rounded-lg border border-gray-100 bg-gray-50 p-12 text-center">
+            <p className="text-lg font-semibold text-gray-600">
+              {lang === "en"
+                ? "No gallery images for this event yet."
+                : "ఈ ఈవెంట్ కోసం ఇంకా చిత్రాలు లేవు."}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Lightbox Modal */}

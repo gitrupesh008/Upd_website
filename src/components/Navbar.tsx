@@ -15,6 +15,7 @@ export default function Navbar() {
     { id: "global-causes", en: "Global Causes", te: "ప్రపంచ లక్ష్యాలు" },
     { id: "gallery", en: "Gallery", te: "చిత్రమాలిక" },
     { id: "contact", en: "Contact", te: "సంప్రదించండి" },
+    { id: "admin", en: "Admin", te: "Admin" },
   ];
 
   return (

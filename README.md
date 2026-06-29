@@ -18,3 +18,12 @@ View your app in AI Studio: https://ai.studio/apps/0be3ff62-ac7d-43d8-9e3f-ceaf8
 2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
 3. Run the app:
    `npm run dev`
+
+## Admin Panel
+
+Open `/#admin` after starting the app.
+
+Default user id: `admin`
+Default password: `admin@316G`
+
+The admin panel manages event calendar entries and each event's gallery using browser local storage.

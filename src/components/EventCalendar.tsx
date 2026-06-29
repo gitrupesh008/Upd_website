@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useLanguage } from '../LanguageContext';
 import { Calendar as CalendarIcon, MapPin, Clock, ChevronLeft, ChevronRight, Printer } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useManagedEvents } from '../hooks/useManagedEvents';
 
 const eventsData = [
   {
@@ -56,6 +57,7 @@ const eventsData = [
 
 export default function EventCalendar() {
   const { lang } = useLanguage();
+  const { events } = useManagedEvents();
   const [currentMonth, setCurrentMonth] = useState(new Date("2026-06-01"));
 
   const nextMonth = () => {
@@ -69,10 +71,10 @@ export default function EventCalendar() {
   const formattedMonth = currentMonth.toLocaleString('en-US', { month: 'long', year: 'numeric' });
 
   // Filter events for the current month
-  const currentMonthEvents = eventsData.filter(event => {
+  const currentMonthEvents = useMemo(() => events.filter(event => {
     const eventDate = new Date(event.date);
     return eventDate.getMonth() === currentMonth.getMonth() && eventDate.getFullYear() === currentMonth.getFullYear();
-  }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()), [currentMonth, events]);
 
   const handlePrint = () => {
     window.print();
